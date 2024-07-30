@@ -38,7 +38,7 @@
       schedulerEditor.schedulerPreviewLink = `${window.location.origin}/?config_id={config.id}`; // Replace with the URL of the page where you want to display the scheduler
       // schedulerEditor.schedulerPreviewLink = `https://book.nylas.com/us/91d00c38-784b-4e2c-92b5-d1da74b3f17c/{slug}` (for using hosted scheduler)
       schedulerEditor.nylasSessionsConfig = {
-        clientId: "YOUR_cLIENT_ID", // Replace with your Nylas client ID from nylas dashboard
+        clientId: "NYLAS_CLIENT_ID", // Replace with your Nylas client ID from nylas dashboard
         redirectUri: `${window.location.origin}/scheduler-editor`, // Replace with the redirect URI you set in the Nylas dashboard
         domain: "https://api.eu.nylas.com/v3", // or 'https://api.us.nylas.com/v3' for US data center
         hosted: true,
