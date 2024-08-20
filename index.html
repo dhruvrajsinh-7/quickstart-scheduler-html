@@ -23,6 +23,7 @@
       body {
         font-family: "Inter", sans-serif;
       }
+      
     </style>
   </head>
 
@@ -38,7 +39,7 @@
         </a>
 
         <!-- Add the Nylas Scheduling Component -->
-        <nylas-scheduling></nylas-scheduling>
+        <nylas-scheduling id="scheduler" eventOverrides='{"bookingRefExtracted": bookingrefextractfun}' nylas-branding="false"><nylas-scheduling>
       </div>
     </div>
 
@@ -48,6 +49,23 @@
 
       // Set the scheduler api url based on the data center
       nylasScheduling.schedulerApiUrl = "https://api.eu.nylas.com/v3"; 
+      nylasScheduling.eventOverrides = {
+        bookingFormSubmitted: async (event) => {
+          console.log('bookingFormSubmitted', event);
+        },
+      }
+      // Wait until the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', function () {
+    // Select the Nylas Scheduler component (replace `#scheduler` with your component's actual selector)
+    const scheduler = document.getElementById('scheduler');
+
+    function bookingrefextractfun(event)
+    {
+      console.log('inside booking')
+      console.log(event)
+    }
+});
+
       // or 'https://api.us.nylas.com/v3' for US data center make sure you use correct data center according to your test account(you can see it in nylas dashboard) 
       // Get the scheduler configuration ID from the URL ?config_id=NYLAS_SCHEDULER_CONFIGURATION_ID
       const urlParams = new URLSearchParams(window.location.search);

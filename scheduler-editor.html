@@ -22,14 +22,36 @@
     <style type="text/css">
       body {
         font-family: "Inter", sans-serif;
-      }      
+      }     
+      nylas-scheduler-editor::part(nse__close-button){
+        display: none;
+      }
+      nylas-scheduler-editor::part(editor__footer-preview){
+        display: none;
+      }
+      nylas-scheduler-editor::part(editor__footer-buttons) {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      nylas-scheduler-editor::part(editor__footer-cancel) {
+        margin-right: auto; 
+      }
+
+      nylas-scheduler-editor::part(editor__footer-cta) {
+        margin-left: auto; 
+      }
+
     </style>
   </head>
 
   <body class="h-full">
     <div class="grid h-full place-items-center">
       <!-- Add the Nylas Scheduler Editor component -->
-      <nylas-scheduler-editor />
+      <nylas-scheduler-editor 
+        />
       </div>
 
     <!-- Configure the Nylas Scheduler Editor component -->
@@ -37,8 +59,9 @@
       const schedulerEditor = document.querySelector("nylas-scheduler-editor");
       schedulerEditor.schedulerPreviewLink = `${window.location.origin}/?config_id={config.id}`; // Replace with the URL of the page where you want to display the scheduler
       // schedulerEditor.schedulerPreviewLink = `https://book.nylas.com/us/91d00c38-784b-4e2c-92b5-d1da74b3f17c/{slug}` (for using hosted scheduler)
+      // schedulerEditor.configurationId = "config.id"; // Replace with the configuration ID you want to edit
       schedulerEditor.nylasSessionsConfig = {
-        clientId: "NYLAS_CLIENT_ID", // Replace with your Nylas client ID from nylas dashboard
+        clientId: "YOUR_CLIENT_ID", // Replace with your Nylas client ID from nylas dashboard
         redirectUri: `${window.location.origin}/scheduler-editor`, // Replace with the redirect URI you set in the Nylas dashboard
         domain: "https://api.eu.nylas.com/v3", // or 'https://api.us.nylas.com/v3' for US data center
         hosted: true,
@@ -55,6 +78,16 @@
           },
         },
       };
+      schedulerEditor.eventOverrides = {
+        schedulerConfigChanged: async (event) => {
+          console.log(event)
+        },
+        formSubmitted: async (event) => {
+          console.log(event)
+        },
+        
+      };
     </script>
   </body>
+
 </html>   
