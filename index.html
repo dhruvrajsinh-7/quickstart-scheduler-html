@@ -23,7 +23,7 @@
       body {
         font-family: "Inter", sans-serif;
       }
-      
+
     </style>
   </head>
 
@@ -46,14 +46,26 @@
     <!-- Configure the Nylas Scheduling Component with a scheduler configuration ID -->
     <script type="module">
       const nylasScheduling = document.querySelector("nylas-scheduling");
-
       // Set the scheduler api url based on the data center
       nylasScheduling.schedulerApiUrl = "https://api.eu.nylas.com/v3"; 
       nylasScheduling.eventOverrides = {
         bookingFormSubmitted: async (event) => {
           console.log('bookingFormSubmitted', event);
         },
+        configSettingsLoaded: async (event) => {
+      const settings = event.detail.settings.data.appearance;
+      console.log('booking configs', settings);
+
+      // Dynamically set the localization labels based on the settings
+      nylasScheduling.localization = {
+        en: {
+          bookingConfirmedDescription: settings.thank_you_message || "You'll receive an email confirmation soon.",
+        },
+        // Add more languages here if needed
+      };
+
       }
+    }
       // Wait until the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function () {
     // Select the Nylas Scheduler component (replace `#scheduler` with your component's actual selector)
