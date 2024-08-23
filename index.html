@@ -1,96 +1,122 @@
 <!DOCTYPE html>
 <html class="h-full bg-white" lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nylas Scheduling Component</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
-      rel="stylesheet"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nylas Scheduling Component</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
 
-    <script
-      type="module"
-      src="./node_modules/@nylas/web-elements/dist/nylas-web-elements/nylas-web-elements.esm.js"
-    ></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <style type="text/css">
-      body {
-        font-family: "Inter", sans-serif;
-      }
+  <script type="module"
+    src="./node_modules/@nylas/web-elements/dist/nylas-web-elements/nylas-web-elements.esm.js"></script>
 
-    </style>
-  </head>
+  <style type="text/css">
+    body {
+      font-family: "Inter", sans-serif;
+    }
+  </style>
+</head>
 
-  <body>
-    <div class="grid gap-0 h-full place-items-center">
-      <div class="grid gap-4">
-        <!-- A button to view the scheduler editor -->
-        <a
-          href="scheduler-editor.html"
-          class="w-fit border border-blue-500 hover:bg-blue-100 text-blue-500 font-bold py-2 px-4 rounded"
-        >
-          View Scheduler Editor
-        </a>
-
-        <!-- Add the Nylas Scheduling Component -->
-        <nylas-scheduling id="scheduler" eventOverrides='{"bookingRefExtracted": bookingrefextractfun}' nylas-branding="false"><nylas-scheduling>
-      </div>
+<body class="h-full">
+  <div class="grid gap-0 h-full place-items-center">
+      <!-- A button to view the scheduler editor -->
+      <!-- <a href="scheduler-editor.html"
+        class="w-fit border border-blue-500 hover:bg-blue-100 text-blue-500 font-bold py-2 px-4 rounded">
+        View Scheduler Editor
+      </a> -->
+      <!-- Add the Nylas Scheduling Component -->
+        <img id="logo" src="" />
+        <nylas-scheduling id="scheduler" eventOverrides='{"bookingRefExtracted": bookingrefextractfun}'
+        nylas-branding="false">
+        <nylas-scheduling>          
     </div>
+  </div>
 
-    <!-- Configure the Nylas Scheduling Component with a scheduler configuration ID -->
-    <script type="module">
-      const nylasScheduling = document.querySelector("nylas-scheduling");
-      // Set the scheduler api url based on the data center
-      nylasScheduling.schedulerApiUrl = "https://api.eu.nylas.com/v3"; 
-      nylasScheduling.eventOverrides = {
-        bookingFormSubmitted: async (event) => {
-          console.log('bookingFormSubmitted', event);
-        },
-        configSettingsLoaded: async (event) => {
-      const settings = event.detail.settings.data.appearance;
-      console.log('booking configs', settings);
+  <!-- Configure the Nylas Scheduling Component with a scheduler configuration ID -->
+  <script type="module">
+    const nylasScheduling = document.querySelector("nylas-scheduling");
+    const LANGUAGE_CODES = ["en", "es", "fr", "de", "sv", "zhcn", "ja", "nl"];
+    const img = document.getElementById('logo');
 
-      // Dynamically set the localization labels based on the settings
-      nylasScheduling.localization = {
-        en: {
-          bookingConfirmedDescription: settings.thank_you_message || "You'll receive an email confirmation soon.",
-        },
-        // Add more languages here if needed
-      };
+    // Set the scheduler api url based on the data center
+    nylasScheduling.schedulerApiUrl = "https://api.eu.nylas.com/v3";
+    nylasScheduling.eventOverrides = {
+      bookingFormSubmitted: async (event) => {
+        console.log('bookingFormSubmitted', event);
+      },
+      configSettingsLoaded: async (event) => {
+        const { settings } = event.detail;
+        const { submit_button_label,thank_you_message,company_logo_url } = settings.data.appearance;
+
+        if (!settings.data.appearance) {
+          nylasScheduling.themeConfig = {};
+          return;
+        }
+        const overrides = {
+          bookNowButton: submit_button_label || 'book now',
+          bookingConfirmedDescription: thank_you_message ||  "You'll receive an email confirmation soon.",
+        };
+        const localizationObj = LANGUAGE_CODES.reduce((acc, code) => {
+          acc[code] = overrides;
+          return acc;
+        }, {});
+        nylasScheduling.localization = localizationObj;
+        img.src = company_logo_url;
+
+        const { color } = settings.data.appearance;
+        if (color) {
+          const colorDark10 = '#colorDark10'; // Adjust color to be 10% darker
+          const colorDark20 = '#colorDark20'; // Adjust color to be 20% darker
+
+          nylasScheduling.themeConfig = {
+            "--nylas-primary": color,
+            "--nylas-base-500": color,
+            "--nylas-base-600": colorDark10,
+            "--nylas-base-700": colorDark20,
+          };
+        }
+
+        // Dynamically set the localization labels based on the settings
+        // nylasScheduling.localization = {
+        //   en: {
+        //     bookingConfirmedDescription: settings.thank_you_message || "You'll receive an email confirmation soon.",
+        //   },
+        //   // Add more languages here if needed
+        // };
+
 
       }
     }
-      // Wait until the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function () {
-    // Select the Nylas Scheduler component (replace `#scheduler` with your component's actual selector)
-    const scheduler = document.getElementById('scheduler');
+    // Wait until the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function () {
+      // Select the Nylas Scheduler component (replace `#scheduler` with your component's actual selector)
+      const scheduler = document.getElementById('scheduler');
 
-    function bookingrefextractfun(event)
-    {
-      console.log('inside booking')
-      console.log(event)
-    }
-});
-
-      // or 'https://api.us.nylas.com/v3' for US data center make sure you use correct data center according to your test account(you can see it in nylas dashboard) 
-      // Get the scheduler configuration ID from the URL ?config_id=NYLAS_SCHEDULER_CONFIGURATION_ID
-      const urlParams = new URLSearchParams(window.location.search);
-
-      // If not config_id exists, throw a console.error
-      if (!urlParams.has("config_id")) {
-        console.error(
-          "No scheduler configuration ID found in the URL. Please provide a scheduler configuration ID."
-        );
+      function bookingrefextractfun(event) {
+        console.log('inside booking')
+        console.log(event)
       }
+    });
 
-      // Set the scheduler configuration ID
-      nylasScheduling.configurationId = urlParams.get("config_id");
-    </script>
-  </body>
-</html>   
+    // or 'https://api.us.nylas.com/v3' for US data center make sure you use correct data center according to your test account(you can see it in nylas dashboard) 
+    // Get the scheduler configuration ID from the URL ?config_id=NYLAS_SCHEDULER_CONFIGURATION_ID
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // If not config_id exists, throw a console.error
+    if (!urlParams.has("config_id")) {
+      console.error(
+        "No scheduler configuration ID found in the URL. Please provide a scheduler configuration ID."
+      );
+    }
+
+    // Set the scheduler configuration ID
+    nylasScheduling.configurationId = urlParams.get("config_id");
+  </script>
+</body>
+
+</html>
